@@ -2,17 +2,18 @@
 
 ## TODOs
 
-- RSpec, RuboCop 等の設定を追加する
 - 本番環境でも使える構成なのか試す
-  - db周りの設定の意味を理解
-  - `Dockerfile` の中身を完全に理解
 - 記事を書く
   - 導入してあるリンター、フォーマッタの説明を追記する
 
-## バージョン情報
+## 入っているもの
 
 - [Ruby](https://www.ruby-lang.org/en/) 3.0.0
 - [Rails](https://rubyonrails.org/) 6.1.4
+- [RSpec](https://rspec.info/)
+- [rubocop](https://docs.rubocop.org/)
+- [Solargraph](https://solargraph.org/) : Ruby のコード補完
+- [Node](https://nodejs.org/ja/) 18.7.0
 - [React](https://reactjs.org/) 18.2.0
 - [TypeScript](https://www.typescriptlang.org/) 4.8.2
 - [Docker](https://docs.docker.com/)
@@ -26,6 +27,8 @@ $ git clone https://github.com/NasuPanda/rails-react-ts-vite-docker-example.git 
 # セットアップの実行
 $ docker-compose run frontend yarn
 $ docker-compose run backend bin/rails db:create db:migrate
+# RSpecのセットアップ
+$ docker-compose run backend bin/rails g rspec:install
 
 # コンテナの起動
 $ docker-compose up -d
@@ -184,96 +187,156 @@ console.log(import.meta.env.VITE_APP_TITLE);
 console.dir(import.meta.env);
 ```
 
-### backend
+### バックエンド
 
-次のような `Gemfile` , その他ディレクトリ等を用意。
+インストールしたい gem を記述した `Gemfile` , 必要なディレクトリを用意。
 
-```ruby
-source 'https://rubygems.org'
-git_source(:github) { |repo| "https://github.com/#{repo}.git" }
+#### RSpec
 
-ruby '3.0.0'
+`Gemfile` に以下を追記。
 
-# Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '~> 6.1.6'
-# gem 'rails', '~> 6.0.3'
-# Use postgresql as the database for Active Record
-gem 'pg', '>= 0.18', '< 2.0'
-# Use Puma as the app server
-gem 'puma', '~> 5.6'
-# See https://github.com/rails/execjs#readme for more supported runtimes
-# gem 'mini_racer', platforms: :ruby
-
-# Turbolinks makes navigating your web application faster. Read more: https://github.com/turbolinks/turbolinks
-gem 'turbolinks', '~> 5'
-# Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
-gem 'jbuilder', '~> 2.11'
-# Use Redis adapter to run Action Cable in production
-# gem 'redis', '~> 4.0'
-# Use ActiveModel has_secure_password
-# gem 'bcrypt', '~> 3.1.7'
-
-# Use ActiveStorage variant
-# gem 'mini_magick', '~> 4.8'
-
-# Use Capistrano for deployment
-# gem 'capistrano-rails', group: :development
-
-# Reduces boot times through caching; required in config/boot.rb
-gem 'bootsnap', '>= 1.1.0', require: false
-
+```rb
 group :development, :test do
-  # Call 'byebug' anywhere in the code to stop execution and get a debugger console
-  gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
+  # 省略...
+  # RSpec
+  gem 'rspec-rails'
+	gem 'factory_bot_rails'
 end
+```
 
+セットアップ。
+
+```shell
+# RSpecのセットアップ
+docker-compose run backend bin/rails g rspec:install
+```
+
+#### Rubocop
+
+`Gemfile` に必要な gem を追記、 `rubocop.yml` を作成。
+
+```rb
 group :development do
-  # Access an interactive console on exception pages or by calling 'console' anywhere in the code.
-  gem 'web-console', '>= 4.1.0'
-  # Display performance information such as SQL time and flame graphs for each request in your browser.
-  # Can be configured to work on production as well see: https://github.com/MiniProfiler/rack-mini-profiler/blob/master/README.md
-  gem 'rack-mini-profiler', '~> 3.0'
-  gem 'listen', '~> 3.7'
-  # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
-  gem 'spring'
-  gem 'spring-watcher-listen', '~> 2.0.0'
+  # 省略...
+
+  # Rubocop
+  gem 'rubocop', require: false
+  gem 'rubocop-rails', require: false
+  gem 'rubocop-rspec', require: false
+  # パフォーマンス低下につながるコードを指摘
+	gem 'rubocop-performance', require: false
 end
-
-group :test do
-  # Adds support for Capybara system testing and selenium driver
-  gem 'capybara', '>= 3.26'
-  gem 'selenium-webdriver'
-  # Automate routing spec
-  gem 'route_mechanic'
-end
-
-# Windows does not include zoneinfo files, so bundle the tzinfo-data gem
-gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
-
-gem 'rack-cors', require: 'rack/cors'
 ```
 
-ディレクトリ構成
+`.rubocop.yml` を追加する。
 
+#### Gitフック
+
+Rubocop をコミット前、プッシュ前に実行したい。
+
+参考 : [Docker環境でもGitのcommitやpushの前にRubocopのチェックをする](https://zenn.dev/yamat47/articles/a9b0b4d937ce03b695e9)
+
+`pre-commit` , `pre-push` を `.git/hooks` に作成する。
+
+```sh
+#!/bin/sh
+
+# pre-commit
+
+#!/bin/sh
+
+INITIAL_MESSAGE="Rubocop(pre-commit)"
+ERROR_MESSAGE="FailedToCommit."
+SUCCESS_MESSAGE="CommitSucceeded."
+
+if git diff --cached --name-only --diff-filter=AM | grep '\.rb$'; then
+  echo -e "\e[32m$INITIAL_MESSAGE\e[m"
+  # sedコマンド : /backend => .
+  # ex: /backend/app => ./app
+  git diff --cached --name-only --diff-filter=AM \
+  | grep '\.rb$' \
+    | sed -e "s/backend/./g" \
+    | xargs docker-compose exec -T backend bundle exec rubocop \
+        --fail-level R \
+        --display-only-fail-level-offenses \
+    && echo -e "\e[32m$SUCCESS_MESSAGE \e[m" \
+    || echo -e "\e[31m$ERROR_MESSAGE \e[m"
+fi
 ```
-.
-├── Gemfile
-├── Gemfile.lock
-├── LICENSE
-├── README.md
-├── Rakefile
-├── app
-├── bin
-├── config
-├── config.ru
-├── db
-├── lib
-├── log
-├── prehook
-├── public
-├── test
-├── tmp
-└── vendor
+
+```sh
+#!/bin/sh
+
+# pre-push
+
+#!/bin/sh
+
+INITIAL_MESSAGE="Rubocop(pre-commit)"
+ERROR_MESSAGE="FailedToCommit."
+SUCCESS_MESSAGE="CommitSucceeded."
+
+echo -e "\e[32m$INITIAL_MESSAGE\e[m"
+docker-compose exec -T backend bundle exec rubocop ./**/*.rb \
+  --fail-level R \
+  --display-only-fail-level-offenses \
+  && echo -e "\e[32m$SUCCESS_MESSAGE \e[m" \
+  || echo -e "\e[31m$ERROR_MESSAGE \e[m"
+```
+
+```sh
+cp pre-commit .git/hooks/
+cp pre-push .git/hooks/
+chmod a+x .git/hooks/pre-push
+chmod a+x .git/hooks/pre-commit
+```
+
+#### Solagraph
+
+`settings.json` に以下を追記。
+
+```json
+  // Solgagraph
+  "solargraph.externalServer": {
+    "host": "localhost",
+    "port": 7658
+  },
+  "solargraph.transport": "external",
+  "solargraph.logLevel": "debug",
+  "solargraph.diagnostics": true,
+  "solargraph.hover": false,
+```
+
+```Dockerfile
+FROM ruby:3.0.0-alpine
+
+RUN apk update
+RUN apk add --no-cache --virtual .build-deps gcc make musl-dev build-base libxml2-dev libxslt-dev bash
+RUN gem install solargraph
+RUN solargraph download-core
+
+WORKDIR /app
+
+# Create Gemfile
+RUN bundle init
+RUN echo "gem 'solargraph'" >> Gemfile
+# gem のインストール先を設定
+RUN mkdir /bundle
+RUN bundle config set --local path './bundle'
+RUN bundle install
+
+EXPOSE 7658
+```
+
+```yml
+  # Ruby の補完に使う
+  solargraph:
+    container_name: solargraph
+    build:
+      context: .
+      dockerfile: Dockerfile.solargraph
+    command: bundle exec solargraph socket --host=0.0.0.0 --port=7658
+    ports:
+      - "7658:7658"
 ```
 
 ## 参考
@@ -283,3 +346,9 @@ gem 'rack-cors', require: 'rack/cors'
 [ohbarye/rails-react-typescript-docker-example: An example app built on Ruby on Rails + React.js + TypeScript + Docker Compose](https://github.com/ohbarye/rails-react-typescript-docker-example)
 
 [Docker でフロントエンドとAPIを開発してみた - to-R Media](https://www.to-r.net/media/docer-cra/)
+
+[Docker環境でsolargraphを使う方法 - Qiita](https://qiita.com/belion_freee/items/9e7ea981653237072d1e)
+
+[Docker環境でもGitのcommitやpushの前にRubocopのチェックをする](https://zenn.dev/yamat47/articles/a9b0b4d937ce03b695e9)
+
+[npakk/docker-solargraph: 開発環境で使うsolargraphをDockerコンテナとして利用する](https://github.com/npakk/docker-solargraph)
