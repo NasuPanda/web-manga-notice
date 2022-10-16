@@ -4,17 +4,15 @@
 
   // List of extensions which should be recommended for users of this workspace.
   "recommendations": [
-    "christian-kohler.path-intellisense",
+    // フロントエンド
     "dbaeumer.vscode-eslint",
-    "denoland.vscode-deno",
-    "donjayamanne.githistory",
     "esbenp.prettier-vscode",
-    "MariusAlchimavicius.json-to-ts",
-    "oderwat.indent-rainbow",
+    "mariusalchimavicius.json-to-ts",
     "stylelint.vscode-stylelint",
-    "VisualStudioExptTeam.vscodeintellicode",
-    "vscode-icons-team.vscode-icons",
-    "wix.vscode-import-cost"
+    "wix.vscode-import-cost",
+    // バックエンド
+    "rebornix.ruby",
+    "castwide.solargraph"
   ],
   // List of extensions recommended by VS Code that should not be recommended for users of this workspace.
   "unwantedRecommendations": []

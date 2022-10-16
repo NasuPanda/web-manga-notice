@@ -1,0 +1,69 @@
+{
+  // 監視しないファイル名/ディレクトリ名のパターン
+    "files.watcherExclude": {
+      "**/.git/objects/**": true,
+      "**/node_modules/**": true,
+      "**/vendor/**": true,
+  },
+  // 検索対象から外すファイル・ディレクトリのパスのパターン
+    "search.exclude": {
+      "**/node_modules": true,
+      "**/bundle": true,
+      "**/tmp": true,
+    },
+  // バックエンド
+  "ruby.useLanguageServer": true,
+  "ruby.format": "rubocop",
+  "ruby.lint": {
+      "rubocop": true,
+      "unicode": true,
+  },
+  // Solgagraph
+  "solargraph.externalServer": {
+    "host": "localhost",
+    "port": 7658
+  },
+  "solargraph.transport": "external",
+  "solargraph.logLevel": "debug",
+  "solargraph.diagnostics": true,
+  "solargraph.hover": false,
+  // フロントエンド
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true, // ESLint
+    "source.fixAll.stylelint": true, // stylelint
+  },
+  "css.validate": false,
+  "less.validate": false,
+  "scss.validate": false,
+  "typescript.tsdk": "./node_modules/typescript/lib", // VSCodeデフォルトではなく、プロジェクトのTypeScriptを強制的に使わせる
+  "[html]": {
+      "editor.insertSpaces": true,
+  },
+  "[css]": {
+      "editor.insertSpaces": true
+  },
+  "[javascript]": {
+      "editor.formatOnSave": true,
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
+  },
+  "[javascriptreact]": {
+      "editor.formatOnSave": true,
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
+  },
+  "[typescript]": {
+      "editor.formatOnSave": true,
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
+  },
+  "[typescriptreact]": {
+      "editor.formatOnSave": true,
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
+  },
+  "[graphql]": {
+      "editor.formatOnSave": true,
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
+  },
+  "[json]": {
+      "editor.formatOnSave": true,
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
+  },
+}
