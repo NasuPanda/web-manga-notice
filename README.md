@@ -24,15 +24,17 @@
 ```shell
 $ git clone https://github.com/NasuPanda/rails-react-ts-vite-docker-example.git && cd rails-react-ts-vite-docker-example
 
-# セットアップの実行
 $ docker-compose run frontend yarn
 $ docker-compose run backend bin/rails db:create db:migrate
-# RSpecのセットアップ
 $ docker-compose run backend bin/rails g rspec:install
 
 # コンテナの起動
 $ docker-compose up -d
+
+# pre-commit の登録
+cp pre-commit .git/hooks/pre-commit
 ```
+
 
 ## メモ: 環境構築手順
 
