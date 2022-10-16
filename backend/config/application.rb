@@ -1,6 +1,6 @@
-require_relative "boot"
+require_relative 'boot'
 
-require "rails/all"
+require 'rails/all'
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -19,10 +19,19 @@ module Myapp
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
 
+    # rails g の設定
+    config.generators do |g|
+      g.test_framework :rspec,
+                       fixtures: false,
+                       view_specs: false,
+                       helper_specs: false,
+                       routing_specs: false
+    end
+
     config.middleware.insert_before 0, Rack::Cors do
       allow do
         origins '*'
-        resource '*', headers: :any, methods: [:get, :post, :options]
+        resource '*', headers: :any, methods: %i[get post options]
       end
     end
   end
