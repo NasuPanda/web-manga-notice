@@ -5,7 +5,7 @@ ERROR_MESSAGE="FailedToCommit."
 SUCCESS_MESSAGE="CommitSucceeded."
 
 echo -e "\e[32m$INITIAL_MESSAGE\e[m"
-docker-compose exec -T backend bundle exec rubocop ./**/*.rb \
+docker-compose exec -T backend bundle exec rubocop . \
   --fail-level R \
   --display-only-fail-level-offenses \
   && echo -e "\e[32m$SUCCESS_MESSAGE \e[m" \
