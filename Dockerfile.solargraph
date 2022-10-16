@@ -1,18 +1,17 @@
 FROM ruby:3.0.0-alpine
 
-RUN apk update
-RUN apk add --no-cache --virtual .build-deps gcc make musl-dev build-base libxml2-dev libxslt-dev bash
-RUN gem install solargraph
-RUN solargraph download-core
+RUN apk update \
+  && apk add --no-cache --virtual .build-deps gcc make musl-dev build-base libxml2-dev libxslt-dev bash \
+  && gem install solargraph \
+  && solargraph download-core
 
 WORKDIR /app
 
 # Create Gemfile
-RUN bundle init
-RUN echo "gem 'solargraph'" >> Gemfile
-# gem のインストール先を設定
-RUN mkdir /bundle
-RUN bundle config set --local path './bundle'
-RUN bundle install
+RUN bundle init \
+&& echo "gem 'solargraph'" >> Gemfile \
+&& mkdir /bundle \
+&& bundle config set --local path './bundle' \
+&& bundle install
 
 EXPOSE 7658
