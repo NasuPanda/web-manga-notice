@@ -1,0 +1,14 @@
+#!/bin/sh
+
+INITIAL_MESSAGE="Rubocop(pre-commit)"
+ERROR_MESSAGE="FailedToCommit."
+SUCCESS_MESSAGE="CommitSucceeded."
+
+if git diff --cached --name-only --diff-filter=AM | grep '\.rb$'; then
+  echo -e "\e[32m$INITIAL_MESSAGE\e[m"
+  docker-compose exec -T backend bundle exec rubocop . \
+    --fail-level R \
+    --display-only-fail-level-offenses \
+    && echo -e "\e[32m$SUCCESS_MESSAGE \e[m" \
+    || echo -e "\e[31m$ERROR_MESSAGE \e[m"
+fi
