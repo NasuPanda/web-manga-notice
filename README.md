@@ -21,21 +21,42 @@
 
 ## セットアップ
 
+### 開発環境
 ```shell
-$ git clone https://github.com/NasuPanda/rails-react-ts-vite-docker-example.git && cd rails-react-ts-vite-docker-example
+git clone https://github.com/NasuPanda/web-manga-notice.git && cd web-manga-notice
 
-$ docker-compose run frontend yarn
-$ docker-compose run backend bin/rails db:create db:migrate
-$ docker-compose run backend bin/rails g rspec:install
+docker-compose run frontend yarn
+docker-compose run backend bin/rails db:create db:migrate
+docker-compose run backend bin/rails g rspec:install
 
 # コンテナの起動
-$ docker-compose up -d
+docker-compose up -d
 
 # localhost:3000/greetings/hello => Rails動作確認
 # localhost:9999 => React動作確認
 
 # pre-commit の登録
 cp pre-commit .git/hooks/pre-commit
+```
+
+### 本番環境
+
+- `.env` ファイルの中身を修正
+- `credentials.yml.enc` と `master.key` が必要
+
+```sh
+git clone https://github.com/NasuPanda/web-manga-notice.git && cd web-manga-notice
+
+docker-compose run frontend yarn
+# 本番環境設定で実行する
+docker-compose run backend bin/rails db:setup RAILS_ENV=production
+docker-compose run backend bin/rails g rspec:install
+
+# コンテナの起動
+docker-compose up -d
+
+# localhost:3000/greetings/hello => Rails動作確認
+# localhost:9999 => React動作確認
 ```
 
 
