@@ -31,6 +31,9 @@ $ docker-compose run backend bin/rails g rspec:install
 # コンテナの起動
 $ docker-compose up -d
 
+# localhost:3000/greetings/hello => Rails動作確認
+# localhost:9999 => React動作確認
+
 # pre-commit の登録
 cp pre-commit .git/hooks/pre-commit
 ```
