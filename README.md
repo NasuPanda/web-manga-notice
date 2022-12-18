@@ -56,7 +56,7 @@ docker-compose -f docker-compose.production.yml run frontend yarn \
   && docker-compose -f docker-compose.production.yml run backend bin/rails g rspec:install
 
 # コンテナの起動
-docker-compose up -f docker-compose.production.yml -d
+docker-compose -f docker-compose.production.yml up -d
 ```
 
 
