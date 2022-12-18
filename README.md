@@ -47,16 +47,16 @@ cp pre-commit .git/hooks/pre-commit
 ```sh
 git clone https://github.com/NasuPanda/web-manga-notice.git && cd web-manga-notice
 
-docker-compose run frontend yarn
+# ローカルの `master.key` を `backend/config` 配下にコピーしてくる
+vim backend/config/master.key
+
 # 本番環境設定で実行する
-docker-compose run backend bin/rails db:setup RAILS_ENV=production
-docker-compose run backend bin/rails g rspec:install
+docker-compose -f docker-compose.production.yml run frontend yarn \
+  && docker-compose -f docker-compose.production.yml run backend bin/rails db:setup RAILS_ENV=production \
+  && docker-compose -f docker-compose.production.yml run backend bin/rails g rspec:install
 
 # コンテナの起動
-docker-compose up -d
-
-# localhost:3000/greetings/hello => Rails動作確認
-# localhost:9999 => React動作確認
+docker-compose up -f docker-compose.production.yml -d
 ```
 
 
